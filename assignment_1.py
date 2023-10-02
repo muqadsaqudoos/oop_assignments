@@ -1,5 +1,3 @@
-# Online Python compiler (interpreter) to run Python online.
-# Write Python 3 code in this online editor and run it.
 class Fraction:
     def __init__(self,num,den):
         self.num = num
@@ -9,6 +7,7 @@ class Fraction:
         print(f"{self.num}/{self.den}")
         
     def multiply(self,other):
+
         num = self.num*other.num
         den = self.den*other.den
         return f"{num}/{den}"
@@ -20,7 +19,7 @@ class Fraction:
 def main():
     a = Fraction(3,4)
     a.show()
-    b= Fraction(9,10)
+    b= Fraction(9,10) 
     f = a.multiply(b)
     print(f)
     
