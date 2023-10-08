@@ -8,7 +8,7 @@ class Teenda:
         self.__dead = False
 
     @property
-    def Category(self):
+    def Category(self): 
         return self.__category
     
     @Category.setter
@@ -62,11 +62,11 @@ class Teenda:
 
         if (self.Category==5):
             print("splitting...."+str(self))
-            self.Category = 3
+       
 
             half = self.Data[2]//2
             t1 = Teenda (3 ,(self.Data[0],self.Data[1],half))
-            t2 = Teenda (3 ,(half,self.Data[3],self.Data[4],half))
+            t2 = Teenda (3 ,(half,self.Data[3],self.Data[4]))
             if not t1.isValid():
                 t1.destroy()
             if not t2.isValid():
@@ -80,14 +80,26 @@ class Teenda:
         if (rn%20 == 0) and (rn%5 == 0) :
             self.split()
 
-        elif (rn%2 == 0) and (rn%18 == 0) :
+        if (rn%2 == 0) and (rn%18 == 0) :
             self.grow()
 
     def __str__(self):
-        if self.Category == 3:
-            return f"(T3 : {str(self.Data[0])} , {str(self.Data[1])} , {str(self.Data[2])})"
+        r = ""
+        r = (
+            r
+            + "T"
+            + str(self.Category)
+            + ": "
+            + str(self.Data[0])
+            + " "
+            + str(self.Data[1])
+            + " "
+            + str(self.Data[2])
+        )
         if self.Category == 5:
-            return f"(T5 : {str(self.Data[0])} , {str(self.Data[1])} , {str(self.Data[2])} , {str(self.Data[3])} , {str(self.Data[4])})"
+            r = r + " " + str(self.Data[3]) + " " + str(self.Data[4])
+        return r
+
 
 
 def main():
@@ -96,7 +108,7 @@ def main():
     teendas.append(Teenda(5, [23, 35, 42, 30, 20]))
     teendas.append(Teenda(3, [7, 29, 3]))
     for i in range(50):
-        print("Iteration NO",i)
+        print("Iteration NO",i+1)
         for j in teendas:
             if j.Dead == False:
                 print(j)
