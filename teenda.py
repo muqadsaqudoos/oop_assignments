@@ -67,7 +67,7 @@ class Teenda:
 
             h = self.Data[2] // 2
             t1 = Teenda(3, [self.Data[0], self.Data[1], h])
-            t2 = Teenda(3, [h, self.Data[3], self.Data[4], h])
+            t2 = Teenda(3, [h, self.Data[3], self.Data[4]])
             if not t1.__isValid():
                 t1.__destroy()
             if not t2.__isValid():
