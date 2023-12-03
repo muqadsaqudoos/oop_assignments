@@ -32,7 +32,7 @@ def pack_grade(grade):
 def unpack_grade(data):
     unpacked_data = struct.unpack("20s11sf", data)
     course, roll_no, percent_marks = unpacked_data
-    return Grade(course.decode(), roll_no.decode(), percent_marks)
+    return Grade(course.decode().rstrip('\x100'), roll_no.decode().rstrip('\x100'), percent_marks)
 
 def write_data(file_name, data, pack_func):
     with open(file_name, 'wb') as file:
@@ -58,7 +58,7 @@ def add_student(students, new_student, student_data_file):
         if existing_student.roll_no == new_student.roll_no:
             print(f"Duplicate entry! Student with roll number {new_student.roll_no} already exists.")
             flag = 0
-            return
+            break
     if flag == 1:
         students.append(new_student)
         print(f"Student with roll number {new_student.roll_no} added successfully!")
@@ -69,20 +69,27 @@ def view_student_by_roll_no(students, roll_no):
         if student.roll_no == roll_no:
             print(f"Roll No: {student.roll_no}, Name: {student.name}, Dept Code: {student.dept_code}, "
                   f"Semester: {student.semester}, Last Sem Percent: {student.last_sem_percent}, Phone: {student.phone}")
-            return
+            break
     print(f"No student found with roll number {roll_no}.")
 
-def edit_student_by_roll_no(students, roll_no, new_student_data, student_data_file):
+def edit_student_by_roll_no(students, new_student_data, student_data_file):
+    flag =1 
     for student in students:
-        if student.roll_no == roll_no:
+        if student.roll_no == new_student_data.roll_no:
             student.name = new_student_data.name
             student.dept_code = new_student_data.dept_code
             student.semester = new_student_data.semester
             student.last_sem_percent = new_student_data.last_sem_percent
             student.phone = new_student_data.phone
+            write_data(student_data_file, students, pack_student)
+            print(f'Updated successfully\nRoll no: {new_student_data.roll_no}, name: {new_student_data.name}, dept_code: {new_student_data.dept_code}, '
+                  f'semester: {new_student_data.semester}, last_sem_percent: {new_student_data.last_sem_percent}, phone: {new_student_data.phone}')
+            flag = 0
+            break
+    if flag == 1:
+        print(f'No student find with roll no {roll_no} ')
 
-    write_data(student_data_file, students, pack_student)
-    print('Data updated successfully')
+   
 
 def del_student(students, roll_no, student_data_file):
     for student in students:
@@ -90,10 +97,7 @@ def del_student(students, roll_no, student_data_file):
             students.remove(student)
             print(f"Student with roll number {roll_no} deleted successfully")
             write_data(student_data_file, students, pack_student)
-            return
-
-    print(f"Student with roll number {roll_no} does not exist")
-
+            break
 
 def list_student_by_sem(students, sem):
     for student in students:
@@ -112,24 +116,91 @@ def print_student_list(students):
         s.append(student_info)
     print(s)
             
+def add_grade(grades, new_grade, grade_data_file):
+    flag = 1
+    for grade in grades:
+        if (grade.roll_no == new_grade.roll_no and grade.course==new_grade.course):
+            print(f"Duplicate entry! course {new_grade.course} already exist")
+            flag = 0
+            break
+    if flag == 1:
+        grades.append(new_grade)
+        print(f"grade  for course {new_grade.course} added successfully!")
+        write_data(grade_data_file, grades, pack_grade)
 
+def import_grade(file_name, grades, grade_data_file):
+    with open(file_name,'r') as file:
+        file.readline()
+        for line in file:
+            roll_no, course, percent_marks = line.strip().split('\t')
+            new_grade = Grade(roll_no, course, float(percent_marks))
+            for grade in grades:
+                if grade.roll_no!= new_grade.roll_no and grade.course!=new_grade.course:
+                    add_grade(grades, new_grade, grade_data_file)
+                    
+def view_grade_by_course(grades, course):
+    for grade in grades:
+        if grade.course == course:
+            print(f"Roll No: {grade.roll_no}, course:{grade.course} Percent_marks: {grade.percent_marks}")
+
+def edit_grade_for_course(grades, new_grade_data, grade_data_file):
+    flag =1 
+    for grade in grades:
+        if grade.course==new_grade_data.course and grade.roll_no==new_grade_data.roll_no:
+            grade.percent_marks = new_grade_data.percent_marks
+            write_data(grade_data_file, grades, pack_grade)
+            print(f"Data updated successfully\nRoll no: {new_grade_data.roll_no}, "
+                  f"course: {new_grade_data.course}, percent_marks: {new_grade_data.percent_marks}")
+            flag = 0
+            break
+    if flag == 1:
+        print(f'No grade found for Roll number {roll_no} and Course {course}.')
+
+def del_grade(grades, roll_no, course, grade_data_file):
+    for grade in grades:
+        if grade.roll_no == roll_no and grade.course == course:
+            grades.remove(grade)
+            print(f"grade with Roll no {roll_no} and Course {course} removed successfully")
+            write_data(grade_data_file, grades, pack_grade)
+            break
+
+def list_student_marks_for_each_course(grades, roll_no):
+    print(f"\nRoll no: {roll_no}")
+    for grade in grades:
+        if grade.roll_no == roll_no:
+            print(f"Course: {grade.course}, Percent marks: {grade.percent_marks}")
+    
+def list_course_marks(grades, course):
+    print(f"\nCourse: {course}")
+    for grade in grades:
+        if grade.course == course:
+            print(f"Roll no: {grade.roll_no}, Percent_marks: {grade.percent_marks}")
+        
+    
 def main():
     file_name = "students.dat"
     new_student1 = Student('bsdsf22a039', 'muqadsa qudoos', 'ds', 2, 3.61, '03027615626')
-    new_student2 = Student('abc12345678', 'John Doe', 'cs', 3, 3.75, '1234567890')
-    new_student3 = Student('xyz98765432', 'Jane Smith', 'ee', 2, 3.85, '9876543210')
+    new_student2 = Student('bscsf22a031', 'hamna', 'cs', 5, 3.98, '12345678912')
+    new_student3 = Student('bssef22a036', 'kashaf Abbas', 'se', 2, 3.78, '04527816526')
+    new_student4 = Student('bssef22a014', 'tehreem fatima', 'cs', 2, 3.98, '03892716526')
 
     students = read_data(file_name, unpack_student)
     # add student
-    print("adding students:)")
+    print("adding students:")
     add_student(students, new_student1, file_name)
     add_student(students, new_student2, file_name)
     add_student(students, new_student3, file_name)
+    add_student(students, new_student4, file_name)
     
     #view student
-    print("\nAll Students:")
-    for student in students:
-        view_student_by_roll_no(students, student.roll_no)
+    print("\nView Students:")
+    view_student_by_roll_no(students, "bsdsf22a039")
+
+    #edit student
+    print("\nedit Student:")
+    new_student5 = Student('bssef22a014', 'tehreem fatima', 'cs', 2, 4.00, '03892716526')
+    edit_student_by_roll_no(students, new_student5, file_name)
+    
 
     # list students by semester
     semester = 2
@@ -144,6 +215,42 @@ def main():
     #print student list
     print("\nstudents list:")
     print_student_list(students)
+
+    
+    file_name2 = "grades.dat"
+    with open(file_name2,'wb'):
+        pass
+    new_grade1 = Grade("oop","bsdsf22a039",73.8)
+    new_grade2 = Grade("dld","bsdsf22a039",79.8)
+    new_grade3 = Grade("probability","bsdsf22a039",79.00)
+    new_grade4 = Grade("probability","bsdsf22a039",79.00)
+    grades = read_data(file_name2, unpack_grade)
+
+    #add grade
+    print("\nadding grades")
+    add_grade(grades, new_grade1, file_name2)
+    add_grade(grades, new_grade2, file_name2)
+    add_grade(grades, new_grade3, file_name2)
+    add_grade(grades, new_grade4, file_name2)
+
+    #import grade from text file
+    print("\nimport grades from text file")
+    import_grade('grades.txt', grades, file_name2)
+
+    #view grade
+    print("\nView grades:")
+    view_grade_by_course(grades,"oop")
+
+    #edit grade
+    print("\nedit grade:")
+    new_grade5 = Grade("probability","bsdsf22a039",90.0)
+    edit_grade_for_course(grades, new_grade5, file_name2)
+
+    #list each course for 1 studnet
+    list_student_marks_for_each_course(grades, 'bsdsf22a031')
+
+    #list marks for 1 course
+    list_course_marks(grades, "dld")
 
 main()
 
