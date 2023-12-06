@@ -1,0 +1,11 @@
+courses	roll_no	percent_marks
+probability	bssef22a015	73.6
+oop	bssef22a015	90.2
+dld	bsdsf22a031	82.1
+probability	bsdsf22a031	83.1
+oop	bsdsf22a036	78.8
+dld	bsdsf22a036	85.1
+probability	bssef22a014	93.1
+oop	bssef22a014	53.1
+dld	bssef22a015	53.1
+probability	bssef22a015	53.1
