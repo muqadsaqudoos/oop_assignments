@@ -274,7 +274,7 @@ def main():
 
     #import grade from text file
     print("\nimport grades from text file")
-    import_grade('grades.txt', grades, file_2)
+    import_grade('tabed_text_file.txt', grades, file_2)
 
     #view grade
     print("\nView grades:")
